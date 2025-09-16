@@ -865,9 +865,7 @@
     const INITIAL_COUNT = 1;   // show only the latest at first
     const LOAD_MORE_STEP = 1;  // how many to append each click
 
-    // ====== 3) Utilities to build card markup ======
     function createProjectCard(project) {
-      // Build the accomplishments <li> list
       const itemsHTML = [
         project.tools?.length ? `<li><b>Tools:</b> ${project.tools.join(", ")}</li>` : ""
       ]
@@ -926,14 +924,13 @@
       return escapeHTML(str).replace(/"/g, "&quot;");
     }
 
-    // ====== 4) Renderer with "Load More" behavior ======
     (function initRecentProjects() {
       const listEl = document.getElementById("recent-projects-list");
       const loadMoreBtn = document.getElementById("load-more-projects");
 
       if (!listEl || !loadMoreBtn) return;
 
-      let nextIndex = 0; // where we’re at in PROJECTS
+      let nextIndex = 0;
 
       function renderBatch(count) {
         const slice = PROJECTS.slice(nextIndex, nextIndex + count);
@@ -941,16 +938,13 @@
         listEl.insertAdjacentHTML("beforeend", html);
         nextIndex += slice.length;
 
-        // Hide button if all projects are rendered
         if (nextIndex >= PROJECTS.length) {
           loadMoreBtn.style.display = "none";
         }
       }
 
-      // Initial render: ONLY the latest project
       renderBatch(INITIAL_COUNT);
 
-      // Enhance: init Materialize tooltips if available
       if (window.M && M.Tooltip) {
         setTimeout(() => {
           const elems = document.querySelectorAll(".tooltipped");
@@ -958,10 +952,8 @@
         }, 0);
       }
 
-      // Click to load more
       loadMoreBtn.addEventListener("click", () => {
         renderBatch(LOAD_MORE_STEP);
-        // Re-init tooltips for newly added nodes
         if (window.M && M.Tooltip) {
           const elems = listEl.querySelectorAll(".tooltipped");
           M.Tooltip.init(elems, {});

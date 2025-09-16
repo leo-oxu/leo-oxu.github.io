@@ -30,6 +30,11 @@
   <img src="examples/activity4b.png">
 </p>
 
+### Activity 5
+<p align="center"> 
+  <img src="examples/activity5.png">
+</p>
+
 ## Installation & Deployment 📦
 - Clone the repository and modify the content of <b>index.html</b> according to your requirement.
 - Add or remove images from `varadbhogayata.github.io/assets/img/` directory as per your requirement.
