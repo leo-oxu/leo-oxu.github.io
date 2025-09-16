@@ -14,12 +14,20 @@
   <img src="examples/activity2b.png">
 </p>
 
-### Activity 2
+### Activity 3
 <p align="center"> 
   <img src="examples/activity3.png">
 </p>
 <p align="center"> 
   <img src="examples/activity3b.png">
+</p>
+
+### Activity 4
+<p align="center"> 
+  <img src="examples/activity4.png">
+</p>
+<p align="center"> 
+  <img src="examples/activity4b.png">
 </p>
 
 ## Installation & Deployment 📦
