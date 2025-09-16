@@ -427,43 +427,6 @@
             </div>
           </div>
 
-          <!-- 1. Django Project -->
-          <!-- <div class="col s12 m6 l6">
-            <div class="card medium">
-              <div class="card-image waves-effect waves-block waves-light">
-                <img alt="django web app" src="/assets/img/project-library-logo.png" style="height: 100%; width: 100%" class="activator" />
-              </div>
-              <div class="card-content">
-                <span class="card-title activator indigo-text hoverline">Local Library Web-App<i
-                    class="mdi-navigation-more-vert right"></i></span>
-                <p>
-                  A web-app that creates an online catalog for a small local library, where users can browse available books and manage their accounts.
-                </p>
-              </div>
-              <div class="card-reveal">
-                <span class="card-title grey-text"><small>Accomplishments</small><i
-                    class="mdi-navigation-close right"></i></span>
-                <ul>
-                  <li><b>Tools:</b> HTML, CSS, Bootstrap, SQLite, Django, Heroku</li>
-                  <li>Users can view list and detail information for books and authors.</li>
-                  <li>Admin users can create and manage models.</li>
-                  <li>Librarians can renew reserved books.</li>
-
-                </ul>
-                <div class="card-action">
-                  <a aria-label="Visit " href="https://django-local-lib.herokuapp.com" target="_blank" data-position="top"
-                    data-tooltip="View Online"
-                    class="btn-floating btn-large waves-effect waves-light blue-grey tooltipped"><i
-                      class="fa fa-external-link"></i></a>
-                  <a aria-label="Visit the GitHub repo for  project" href="https://github.com/varadbhogayata/django-local-library"
-                    target="_blank" data-position="top" data-tooltip="View Source"
-                    class="btn-floating btn-large waves-effect waves-light blue-grey tooltipped"><i
-                      class="fa fa-github"></i></a>
-                </div>
-              </div>
-            </div>
-          </div> -->
-
           <div class="col s12 m6 l4">
             <div class="card medium">
               <div class="card-image waves-effect waves-block waves-light">
@@ -536,6 +499,27 @@
           
 
           <!-- ************* -->
+        </div>
+      </div>
+    </section>
+
+    <section id="recent-projects" class="section scrollspy">
+      <h3 class="page-title white-text indigo">Recent Projects</h3>
+
+      <div class="container">
+        <!-- JS will inject cards here -->
+        <div id="recent-projects-list" class="row" aria-live="polite"></div>
+
+        <!-- Load More -->
+        <div class="row" style="margin-top: 16px;">
+          <div class="col s12 center">
+            <button id="load-more-projects"
+                    class="btn waves-effect waves-light indigo"
+                    type="button"
+                    aria-controls="recent-projects-list">
+              Load More
+            </button>
+          </div>
         </div>
       </div>
     </section>
@@ -825,6 +809,165 @@
         closeOnClick: true // Closes side-nav on <a> clicks, useful for Angular/Meteor
       })
     })
+  </script>
+
+  <script>
+    const PROJECTS = [
+      {
+        title: "LLM-Based Travel Recommendation System",
+        image: { src: "/assets/img/travel-recom.jpg", alt: "travel" },
+        blurb: "A project to familiarize myself with MLOps",
+        tools: ["Python", "Dagster", "FastAPI", "Docker", "Kubernetes", "LangChain", "LangGraph", "MLflow", "Prometheus", "Grafana"],
+        bullets: [
+          "Designing a modular LLM pipeline with Dagster, FastAPI, Docker, and Kubernetes to serve grounded, queryable travel recommendations.",
+          "Integrating Retrieval-Augmented Generation (RAG) for context-aware responses and building multi-agent workflows using LangChain and LangGraph.",
+          "Tracking experiments via MLflow, monitoring performance with Prometheus + Grafana, focusing on end-to-end MLOps best practices."
+        ],
+        repo: "https://github.com/leo-oxu/travel-recommender"
+      },
+      {
+        title: "Image Super-Resolution Model",
+        image: { src: "/assets/img/superres.webp", alt: "superres" },
+        blurb: "Convert low-quality photos to higher resolution ones",
+        tools: ["Python", "PyTorch", "GANs"],
+        bullets: [
+          "Built a custom GAN to upscale 512×512 face images to 1024×1024 using FFHQ in a team of 3.",
+          "Generator with PixelShuffle and residual upsampling; trained with BCE loss and manual early stopping every 30 epochs.",
+          "Evaluated output via PSNR on a validation set; implemented full data pipeline with custom transforms and GPU loaders."
+        ],
+        repo: "https://github.com/leo-oxu/Research-Overflow-Study"
+      },
+      {
+        title: "Multicycle Processor in Nios II",
+        image: { src: "/assets/img/processor.jpg", alt: "processor" },
+        blurb: "A multicycle processor",
+        tools: ["NIOS II"],
+        bullets: [
+          "Designed a multicycle processor: instruction decoder, datapath, and control FSM.",
+          "Supports ALU ops and vector add/store/load."
+        ],
+        repo: "https://github.com/leo-oxu/ECE352_coursework/tree/main/ECE352Project"
+      },
+      {
+        title: "Movie Reviews Sentiment RNN Classifier",
+        image: { src: "/assets/img/movie.jpeg", alt: "movie" },
+        blurb: "As described.",
+        tools: ["Python", "JAX", "RNN", "GRU"],
+        bullets: [
+          "Programmed a GRU cell in JAX and trained an RNN with embeddings.",
+          "Classified positive/negative reviews with >75% accuracy.",
+          "Explored SGD, Adam, and early stopping."
+        ],
+        repo: "https://github.com/leo-oxu/ECE421_coursework"
+      }
+    ];
+
+    const INITIAL_COUNT = 1;   // show only the latest at first
+    const LOAD_MORE_STEP = 1;  // how many to append each click
+
+    // ====== 3) Utilities to build card markup ======
+    function createProjectCard(project) {
+      // Build the accomplishments <li> list
+      const itemsHTML = [
+        project.tools?.length ? `<li><b>Tools:</b> ${project.tools.join(", ")}</li>` : ""
+      ]
+      .concat((project.bullets || []).map(b => `<li>${escapeHTML(b)}</li>`))
+      .join("");
+
+      const repoBtn = project.repo ? `
+        <div class="card-action">
+          <a aria-label="Visit the GitHub repo for project"
+            href="${project.repo}" target="_blank"
+            data-position="top" data-tooltip="View Source"
+            class="btn-floating btn-large waves-effect waves-light blue-grey tooltipped">
+            <i class="fa fa-github"></i>
+          </a>
+        </div>` : "";
+
+      return `
+        <div class="col s12 m6 l4 project-card">
+          <div class="card medium">
+            <div class="card-image waves-effect waves-block waves-light">
+              <img alt="${escapeHTML(project.image?.alt || project.title)}"
+                  src="${escapeAttr(project.image?.src || "")}"
+                  style="height: 100%; width: 100%" class="activator" />
+            </div>
+            <div class="card-content">
+              <span class="card-title activator indigo-text hoverline">
+                ${escapeHTML(project.title)}
+                <i class="mdi-navigation-more-vert right"></i>
+              </span>
+              <p>${escapeHTML(project.blurb || "")}</p>
+            </div>
+            <div class="card-reveal">
+              <span class="card-title grey-text">
+                <small>Accomplishments</small>
+                <i class="mdi-navigation-close right"></i>
+              </span>
+              <ul>${itemsHTML}</ul>
+              ${repoBtn}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Simple HTML escaping for safety when injecting strings
+    function escapeHTML(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+    function escapeAttr(str) {
+      // for attributes like src=""
+      return escapeHTML(str).replace(/"/g, "&quot;");
+    }
+
+    // ====== 4) Renderer with "Load More" behavior ======
+    (function initRecentProjects() {
+      const listEl = document.getElementById("recent-projects-list");
+      const loadMoreBtn = document.getElementById("load-more-projects");
+
+      if (!listEl || !loadMoreBtn) return;
+
+      let nextIndex = 0; // where we’re at in PROJECTS
+
+      function renderBatch(count) {
+        const slice = PROJECTS.slice(nextIndex, nextIndex + count);
+        const html = slice.map(createProjectCard).join("");
+        listEl.insertAdjacentHTML("beforeend", html);
+        nextIndex += slice.length;
+
+        // Hide button if all projects are rendered
+        if (nextIndex >= PROJECTS.length) {
+          loadMoreBtn.style.display = "none";
+        }
+      }
+
+      // Initial render: ONLY the latest project
+      renderBatch(INITIAL_COUNT);
+
+      // Enhance: init Materialize tooltips if available
+      if (window.M && M.Tooltip) {
+        setTimeout(() => {
+          const elems = document.querySelectorAll(".tooltipped");
+          M.Tooltip.init(elems, {});
+        }, 0);
+      }
+
+      // Click to load more
+      loadMoreBtn.addEventListener("click", () => {
+        renderBatch(LOAD_MORE_STEP);
+        // Re-init tooltips for newly added nodes
+        if (window.M && M.Tooltip) {
+          const elems = listEl.querySelectorAll(".tooltipped");
+          M.Tooltip.init(elems, {});
+        }
+      });
+    })();
   </script>
 </body>
 
